@@ -1,4 +1,5 @@
 # Smithery configuration: https://smithery.ai/docs/config#smitheryyaml
+# Company Check MCP v0.2.0: GLEIF LEI lookup, Czech ARES (IČO), Poland KRS extract, EU VAT (VIES) + LEI check, via Apify.
 startCommand:
   type: stdio
   configSchema:
@@ -7,7 +8,7 @@ startCommand:
     properties:
       apifyToken:
         type: string
-        description: Your Apify API token. Runs are billed to your own Apify account.
+        description: "Your Apify API token. Company checks (GLEIF LEI, Czech ARES, Poland KRS, EU VAT via VIES + LEI) run on and are billed to your own Apify account."
   commandFunction: |-
     (config) => ({ command: 'company-check-mcp', args: [], env: { APIFY_TOKEN: config.apifyToken } })
   exampleConfig:
