@@ -1,0 +1,14 @@
+# Smithery configuration: https://smithery.ai/docs/config#smitheryyaml
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    required: [apifyToken]
+    properties:
+      apifyToken:
+        type: string
+        description: Your Apify API token. Runs are billed to your own Apify account.
+  commandFunction: |-
+    (config) => ({ command: 'company-check-mcp', args: [], env: { APIFY_TOKEN: config.apifyToken } })
+  exampleConfig:
+    apifyToken: apify_api_xxxxxxxxxxxxxxxx

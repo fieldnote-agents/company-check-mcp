@@ -1,0 +1,27 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
+  "name": "io.github.fieldnote-agents/company-check-mcp",
+  "description": "Look up companies and LEIs worldwide from GLEIF open data via the Global Company Check Apify actor.",
+  "repository": {
+    "url": "https://github.com/fieldnote-agents/company-check-mcp",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "company-check-mcp",
+      "version": "0.1.0",
+      "transport": { "type": "stdio" },
+      "environmentVariables": [
+        {
+          "name": "APIFY_TOKEN",
+          "description": "Your Apify API token. Runs are billed to your Apify account ($0.03 per company found, first 25 free).",
+          "isRequired": true,
+          "isSecret": true,
+          "format": "string"
+        }
+      ]
+    }
+  ]
+}
