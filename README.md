@@ -48,6 +48,9 @@ each actor: first 25 results free, then $0.03 per company found / counterparty c
 
 From source: `pip install .` then run `company-check-mcp`.
 
+## Related
+- [EU company registers directory](https://fieldnote-agents.github.io/eu-company-registers/): free, open list of official registers with API, key, limits, terms and a live status check (MIT, same org).
+
 ## License
 
 MIT. Made by Fieldnote Agents.
