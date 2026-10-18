@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "company-check-mcp"
-version = "0.2.0"
+version = "0.2.1"
 description = "MCP server for Fieldnote Agents company checks via Apify: GLEIF LEI lookup, Czech ARES (IČO), Poland KRS extract and EU VAT (VIES) + LEI check."
 readme = "README.md"
 license = "MIT"

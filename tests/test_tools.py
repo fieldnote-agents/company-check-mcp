@@ -42,3 +42,23 @@ def test_limits(monkeypatch):
 def test_no_token(monkeypatch):
     monkeypatch.delenv("APIFY_TOKEN", raising=False)
     with pytest.raises(RuntimeError): run(S.czech_company_check(["27082440"]))
+
+def test_tool_annotations_and_descriptions():
+    tools = {t.name: t for t in run(S.mcp.list_tools())}
+    for t in tools.values():
+        assert t.annotations and t.annotations.readOnlyHint is True and t.annotations.destructiveHint is False
+        for name, prop in t.inputSchema["properties"].items():
+            assert prop.get("description"), f"{t.name}.{name} has no description"
+
+def test_spending_cap(monkeypatch):
+    fake(monkeypatch)
+    monkeypatch.setenv("COMPANY_CHECK_MAX_CHARGE_USD", "0.5")
+    run(S.czech_company_check(["27082440"]))
+    assert "maxTotalChargeUsd=0.50" in CALLS[0][0]
+    monkeypatch.setenv("COMPANY_CHECK_MAX_CHARGE_USD", "0.01")
+    with pytest.raises(ValueError): run(S.czech_company_check(["27082440"]))
+
+def test_no_cap_by_default(monkeypatch):
+    fake(monkeypatch); monkeypatch.delenv("COMPANY_CHECK_MAX_CHARGE_USD", raising=False)
+    run(S.lookup_lei("549300TTCXZOGZM2EY83"))
+    assert "maxTotalChargeUsd" not in CALLS[0][0]

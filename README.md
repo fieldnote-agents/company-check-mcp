@@ -28,10 +28,20 @@ All tools take up to 500 items per call. Built for KYB, supplier and counterpart
 Runs go to **your own Apify account** using your `APIFY_TOKEN`:
 each actor: first 25 results free, then $0.03 per company found / counterparty checked. No result, no charge.
 
+### Spending cap for agents
+Every tool call is one Apify run. To cap what a single call can cost, set
+`COMPANY_CHECK_MAX_CHARGE_USD` (e.g. `"0.50"`) in the server's `env`; it is sent as
+Apify's `maxTotalChargeUsd` and the actor stops cleanly at the limit.
+**The cap must be at least $0.05**: Apify refuses runs of these actors with a lower max charge.
+Calling the actors directly through the Apify MCP server (`https://mcp.apify.com`, `call-actor`)?
+The same $0.05 minimum applies to `maxTotalChargeUsd` in `callOptions`.
+
 ## Setup
 
 1. Get an Apify API token: https://console.apify.com/settings/integrations
-2. Install: `pip install company-check-mcp` (or `uvx company-check-mcp`)
+2. Install from GitHub (works today; the PyPI package is not published yet):
+   `uvx --from git+https://github.com/fieldnote-agents/company-check-mcp company-check-mcp`
+   or `pip install "git+https://github.com/fieldnote-agents/company-check-mcp"`
 3. Add to your MCP client, e.g. Claude Desktop / Cursor:
 
 ```json
@@ -39,7 +49,7 @@ each actor: first 25 results free, then $0.03 per company found / counterparty c
   "mcpServers": {
     "company-check": {
       "command": "uvx",
-      "args": ["company-check-mcp"],
+      "args": ["--from", "git+https://github.com/fieldnote-agents/company-check-mcp", "company-check-mcp"],
       "env": { "APIFY_TOKEN": "apify_api_..." }
     }
   }
@@ -47,6 +57,8 @@ each actor: first 25 results free, then $0.03 per company found / counterparty c
 ```
 
 From source: `pip install .` then run `company-check-mcp`.
+
+Once on PyPI, the short form `uvx company-check-mcp` will also work.
 
 ## Related
 - [EU company registers directory](https://fieldnote-agents.github.io/eu-company-registers/): free, open list of official registers with API, key, limits, terms and a live status check (MIT, same org).

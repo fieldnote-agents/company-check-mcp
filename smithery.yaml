@@ -1,5 +1,5 @@
 # Smithery configuration: https://smithery.ai/docs/config#smitheryyaml
-# Company Check MCP v0.2.0: GLEIF LEI lookup, Czech ARES (IČO), Poland KRS extract, EU VAT (VIES) + LEI check, via Apify.
+# Company Check MCP v0.2.1: GLEIF LEI lookup, Czech ARES (IČO), Poland KRS extract, EU VAT (VIES) + LEI check, via Apify.
 startCommand:
   type: stdio
   configSchema:
