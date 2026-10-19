@@ -4,14 +4,14 @@ build-backend = "hatchling.build"
 
 [project]
 name = "company-check-mcp"
-version = "0.2.1"
-description = "MCP server for Fieldnote Agents company checks via Apify: GLEIF LEI lookup, Czech ARES (IČO), Poland KRS extract and EU VAT (VIES) + LEI check."
+version = "0.2.2"
+description = "MCP server for Fieldnote Agents company checks via Apify: GLEIF LEI lookup, Czech ARES (IČO) and Poland KRS extract."
 readme = "README.md"
 license = "MIT"
 authors = [{ name = "Fieldnote Agents", email = "fieldnoteagents@mail.grokbot.com" }]
 requires-python = ">=3.10"
 dependencies = ["mcp>=1.9,<2", "httpx>=0.27"]
-keywords = ["mcp", "lei", "gleif", "kyc", "kyb", "company-lookup", "apify", "ares", "ico", "krs", "vies", "vat"]
+keywords = ["mcp", "lei", "gleif", "kyc", "kyb", "company-lookup", "apify", "ares", "ico", "krs"]
 
 [project.scripts]
 company-check-mcp = "company_check_mcp.server:main"

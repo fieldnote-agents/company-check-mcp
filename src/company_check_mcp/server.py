@@ -1,5 +1,6 @@
 """MCP server (stdio) for Fieldnote Agents company-check Apify actors:
-Global Company Check (GLEIF LEI), Czech ARES, Poland KRS and EU VAT (VIES) + LEI check.
+Global Company Check (GLEIF LEI), Czech ARES and Poland KRS.
+The former EU VAT (VIES) tool is disabled since 0.2.2; see legacy/eu_vat.py.
 
 Runs fieldnoteagents/global-company-check on the caller's own Apify account
 (APIFY_TOKEN), so any usage is billed to that account.
@@ -21,7 +22,7 @@ from pydantic import Field
 ACTOR = os.environ.get("COMPANY_CHECK_ACTOR", "fieldnoteagents~global-company-check")
 ARES_ACTOR = os.environ.get("CZECH_CHECK_ACTOR", "fieldnoteagents~czech-company-check-ares")
 KRS_ACTOR = os.environ.get("KRS_CHECK_ACTOR", "fieldnoteagents~poland-krs-company-check")
-EU_ACTOR = os.environ.get("EU_VAT_CHECK_ACTOR", "fieldnoteagents~eu-company-vat-check")
+EU_ACTOR = os.environ.get("EU_VAT_CHECK_ACTOR", "fieldnoteagents~eu-company-vat-check")  # legacy, unused by default
 API = "https://api.apify.com/v2"
 LEI_RE = re.compile(r"^[A-Z0-9]{18}[0-9]{2}$")
 MAX_BULK = 500
@@ -29,7 +30,7 @@ MAX_BULK = 500
 mcp = FastMCP(
     "company-check-mcp",
     instructions=(
-        "Read-only company checks from official public registers (GLEIF, ARES, KRS, VIES). "
+        "Read-only company checks from official public registers (GLEIF, ARES, KRS). "
         "Use for KYB, supplier onboarding and counterparty verification, not for lead lists. "
         "Each call runs an Apify actor billed to the caller's APIFY_TOKEN ($0.03 per result after 25 free). "
         "Prefer one batched call over many single calls."
@@ -175,24 +176,11 @@ async def poland_krs_extract(
     return await _run({"krsNumbers": nums, "includePersons": include_persons, "fullExtract": full_extract}, KRS_ACTOR)
 
 
-@mcp.tool(annotations=RO)
-async def eu_vat_check(
-    vat_numbers: Annotated[list[str], Field(description="1-500 EU VAT numbers with country prefix, e.g. 'IE6388047V'. Max one check per number per day (cached).", min_length=1, max_length=500)],
-    leis: Annotated[list[str] | None, Field(description="Optional LEIs in the same order as vat_numbers, to pin the LEI match.")] = None,
-    match_lei: Annotated[bool, Field(description="Find the GLEIF LEI record for each VAT number.")] = True,
-    requester_vat_number: Annotated[str | None, Field(description="Your own EU VAT number; VIES then returns a consultation number as proof.")] = None,
-) -> list[dict[str, Any]]:
-    """Validate EU VAT numbers of counterparties in VIES (European Commission) and match
-    each to its GLEIF LEI record. VAT numbers need the country prefix ('IE6388047V').
-    Optional leis list (same order) pins the LEI. requester_vat_number makes VIES return
-    a consultation number. For VAT/counterparty verification only, not data harvesting."""
-    vats = _clean(vat_numbers, "vat_numbers")
-    leis = leis or []
-    cps = [{"vatNumber": v, "lei": (leis[i].strip().upper() if i < len(leis) and leis[i] else "")} for i, v in enumerate(vats)]
-    inp: dict[str, Any] = {"counterparties": cps, "matchLei": match_lei}
-    if requester_vat_number:
-        inp["requesterVatNumber"] = requester_vat_number.strip()
-    return await _run(inp, EU_ACTOR)
+# Legacy EU VAT (VIES) tool: off unless COMPANY_CHECK_ENABLE_LEGACY_EU_VAT=1 (maintainers' testing only).
+from .legacy import eu_vat as _legacy_eu_vat  # noqa: E402
+
+if os.environ.get(_legacy_eu_vat.ENV_FLAG, "").strip() == "1":
+    mcp.tool(annotations=RO)(_legacy_eu_vat.make_tool(_run, _clean, EU_ACTOR))
 
 
 def main() -> None:
